@@ -176,7 +176,7 @@ export const DoctorListScreen: React.FC = () => {
                     Consultation Fee
                   </Text>
                   <Text style={styles.feeValue} variant="titleSmall">
-                    ${parseFloat(item.consultationFee).toFixed(0)}
+                    ₹{parseFloat(item.consultationFee).toFixed(0)}
                   </Text>
                 </View>
                 <Button

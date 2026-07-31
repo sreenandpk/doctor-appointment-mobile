@@ -198,7 +198,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
                     Consultation Fee
                   </Text>
                   <Text style={styles.infoValue} variant="bodyMedium">
-                    ${parseFloat(doctor.consultationFee).toFixed(0)} (Paid)
+                    ₹{parseFloat(doctor.consultationFee).toFixed(0)} (Paid)
                   </Text>
                 </View>
               </View>

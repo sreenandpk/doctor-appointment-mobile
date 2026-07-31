@@ -170,7 +170,7 @@ export const DoctorDetailsScreen: React.FC = () => {
             <Card.Content style={styles.statCardContent}>
               <Icon source="cash-outline" size={22} color={COLORS.primary} />
               <Text style={styles.statVal} variant="titleMedium">
-                ${parseFloat(doctor.consultationFee).toFixed(0)}
+                ₹{parseFloat(doctor.consultationFee).toFixed(0)}
               </Text>
               <Text style={styles.statLabel} variant="bodySmall">
                 Fee
