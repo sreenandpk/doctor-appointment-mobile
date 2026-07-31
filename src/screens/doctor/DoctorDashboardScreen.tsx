@@ -269,7 +269,7 @@ export const DoctorDashboardScreen: React.FC = () => {
         <Dialog visible={logoutVisible} onDismiss={() => setLogoutVisible(false)} style={styles.dialog}>
           <Dialog.Title style={styles.dialogTitle}>Sign Out</Dialog.Title>
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure you want to sign out of CareConnect?</Text>
+            <Text variant="bodyMedium">Are you sure you want to sign out of Doctor Booking?</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button

@@ -72,10 +72,10 @@ export const LoginScreen: React.FC = () => {
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <TextInput.Icon icon="heart-pulse" color="#ffffff" size={32} />
+              <TextInput.Icon icon="calendar-check" color="#ffffff" size={32} />
             </View>
             <Text style={styles.title} variant="headlineMedium">
-              CareConnect
+              Doctor Booking
             </Text>
             <Text style={styles.tagline} variant="bodyMedium">
               Seamless doctor consultations & scheduling at your fingertips.
