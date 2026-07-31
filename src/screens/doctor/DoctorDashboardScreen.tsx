@@ -99,14 +99,14 @@ export const DoctorDashboardScreen: React.FC = () => {
           <View style={styles.headerRow}>
             <View style={styles.greetingContainer}>
               <Text style={styles.greeting} variant="titleLarge">
-                Dr. {getDoctorName()} 🏥
+                {getDoctorName().startsWith('Dr.') ? getDoctorName() : `Dr. ${getDoctorName()}`} 🏥
               </Text>
               <Text style={styles.subtitle} variant="bodyMedium">
                 {user?.DoctorProfile?.specialization || 'Healthcare Professional'}
               </Text>
             </View>
             <View style={styles.headerActions}>
-              <Avatar name={`Dr. ${getDoctorName()}`} size={40} type="doctor" backgroundColor={COLORS.primary} />
+              <Avatar name={getDoctorName()} size={40} type="doctor" backgroundColor={COLORS.primary} />
               <IconButton
                 icon="logout"
                 iconColor="#64748b"

@@ -17,7 +17,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ScreenContainer from '../../components/common/ScreenContainer';
-import { Button, Avatar, StatusBadge, SkeletonLoader } from '../../components/ui';
+import { Button, Avatar, StatusBadge, SkeletonLoader, SearchBar } from '../../components/ui';
 import { useAuthStore } from '@/stores/auth.store';
 import { patientApi } from '@/api/patient.api';
 import { PatientStackParamList } from '@/navigation/PatientNavigator';
@@ -117,7 +117,7 @@ export const PatientDashboardScreen: React.FC = () => {
               </Text>
             </View>
             <View style={styles.headerActions}>
-              <Avatar name={getPatientName()} size={40} backgroundColor={COLORS.primary} />
+              <Avatar name={getPatientName()} size={40} type="patient" backgroundColor={COLORS.primary} />
               <IconButton
                 icon="logout"
                 iconColor="#64748b"
@@ -128,6 +128,21 @@ export const PatientDashboardScreen: React.FC = () => {
             </View>
           </View>
         </View>
+
+        {/* Touchable Search Bar banner */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('DoctorList')}
+          style={styles.searchContainer}
+          activeOpacity={0.8}
+        >
+          <View pointerEvents="none">
+            <SearchBar
+              value=""
+              onChangeText={() => {}}
+              placeholder="Search doctor by name or specialty..."
+            />
+          </View>
+        </TouchableOpacity>
 
         {/* Quick Consultation Find Doctor Banner */}
         <Card style={styles.actionCard}>
@@ -455,6 +470,9 @@ const styles = StyleSheet.create({
     ...SHADOWS.light,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary,
+  },
+  searchContainer: {
+    marginBottom: SPACING.md,
   },
   upcomingHeader: {
     flexDirection: 'row',
