@@ -12,6 +12,7 @@ import {
   Portal,
   Dialog,
   Icon,
+  IconButton,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -115,9 +116,16 @@ export const PatientDashboardScreen: React.FC = () => {
                 Find your doctor and consult online
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setLogoutVisible(true)}>
-              <Avatar name={getPatientName()} size={44} backgroundColor={COLORS.primary} />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <Avatar name={getPatientName()} size={40} backgroundColor={COLORS.primary} />
+              <IconButton
+                icon="logout"
+                iconColor="#64748b"
+                size={22}
+                onPress={() => setLogoutVisible(true)}
+                style={styles.logoutButton}
+              />
+            </View>
           </View>
         </View>
 
@@ -136,6 +144,7 @@ export const PatientDashboardScreen: React.FC = () => {
                 onPress={() => navigation.navigate('DoctorList')}
                 style={styles.actionButton}
                 contentStyle={styles.actionButtonContent}
+                textColor="#0ea5e9"
               />
             </View>
             <View style={styles.actionCardIconContainer}>
@@ -324,6 +333,15 @@ const styles = StyleSheet.create({
   greetingContainer: {
     flex: 1,
     paddingRight: SPACING.md,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  logoutButton: {
+    margin: 0,
+    marginRight: -8,
   },
   greeting: {
     fontWeight: 'bold',

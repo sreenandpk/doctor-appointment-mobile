@@ -7,6 +7,7 @@ interface CustomButtonProps extends Omit<ButtonProps, 'children'> {
   title: string;
   onPress: () => void;
   variant?: 'contained' | 'outlined' | 'text';
+  textColor?: string;
 }
 
 export const Button: React.FC<CustomButtonProps> = ({
@@ -14,6 +15,7 @@ export const Button: React.FC<CustomButtonProps> = ({
   onPress,
   variant = 'contained',
   style,
+  textColor,
   ...props
 }) => {
   return (
@@ -22,7 +24,8 @@ export const Button: React.FC<CustomButtonProps> = ({
       onPress={onPress}
       style={[styles.button, style]}
       contentStyle={styles.content}
-      labelStyle={styles.label}
+      labelStyle={[styles.label, textColor ? { color: textColor } : null]}
+      textColor={textColor}
       {...props}
     >
       {title}
