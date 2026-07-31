@@ -186,6 +186,11 @@ export const PatientDashboardScreen: React.FC = () => {
           <Text style={styles.sectionTitle} variant="titleMedium">
             Upcoming Appointment
           </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('MyAppointments')}>
+            <Text style={styles.seeAllText} variant="bodyMedium">
+              See All
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {isLoading ? (
@@ -193,41 +198,47 @@ export const PatientDashboardScreen: React.FC = () => {
             <SkeletonLoader height={140} borderRadius={RADIUS.large} />
           </View>
         ) : upcomingAppointment ? (
-          <Card style={styles.upcomingCard}>
-            <Card.Content>
-              <View style={styles.upcomingHeader}>
-                <View style={styles.doctorInfoRow}>
-                  <Avatar name={upcomingAppointment.doctorName || 'Doctor'} size={40} backgroundColor="#e2e8f0" color="#334155" />
-                  <View style={styles.doctorMeta}>
-                    <Text style={styles.upcomingDoctorName} variant="titleMedium">
-                      {upcomingAppointment.doctorName}
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('AppointmentDetails', { appointmentId: upcomingAppointment.id })
+            }
+          >
+            <Card style={styles.upcomingCard}>
+              <Card.Content>
+                <View style={styles.upcomingHeader}>
+                  <View style={styles.doctorInfoRow}>
+                    <Avatar name={upcomingAppointment.doctorName || 'Doctor'} size={40} type="doctor" backgroundColor="#e2e8f0" color="#334155" />
+                    <View style={styles.doctorMeta}>
+                      <Text style={styles.upcomingDoctorName} variant="titleMedium">
+                        {upcomingAppointment.doctorName}
+                      </Text>
+                      <Text style={styles.upcomingDoctorSpecialty} variant="bodySmall">
+                        {upcomingAppointment.specialization}
+                      </Text>
+                    </View>
+                  </View>
+                  <StatusBadge status={upcomingAppointment.status} />
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.upcomingTimeRow}>
+                  <View style={styles.timeInfoItem}>
+                    <Icon source="calendar-blank-outline" size={18} color="#64748b" />
+                    <Text style={styles.timeText} variant="bodyMedium">
+                      {formatAppointmentDate(upcomingAppointment.appointmentDate)}
                     </Text>
-                    <Text style={styles.upcomingDoctorSpecialty} variant="bodySmall">
-                      {upcomingAppointment.specialization}
+                  </View>
+                  <View style={styles.timeInfoItem}>
+                    <Icon source="clock-outline" size={18} color="#64748b" />
+                    <Text style={styles.timeText} variant="bodyMedium">
+                      {upcomingAppointment.appointmentTime}
                     </Text>
                   </View>
                 </View>
-                <StatusBadge status={upcomingAppointment.status} />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.upcomingTimeRow}>
-                <View style={styles.timeInfoItem}>
-                  <Icon source="calendar-blank-outline" size={18} color="#64748b" />
-                  <Text style={styles.timeText} variant="bodyMedium">
-                    {formatAppointmentDate(upcomingAppointment.appointmentDate)}
-                  </Text>
-                </View>
-                <View style={styles.timeInfoItem}>
-                  <Icon source="clock-outline" size={18} color="#64748b" />
-                  <Text style={styles.timeText} variant="bodyMedium">
-                    {upcomingAppointment.appointmentTime}
-                  </Text>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
         ) : (
           <Card style={styles.emptyCard}>
             <Card.Content style={styles.emptyCardContent}>
@@ -249,6 +260,11 @@ export const PatientDashboardScreen: React.FC = () => {
           <Text style={styles.sectionTitle} variant="titleMedium">
             Recent Visits
           </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('MyAppointments')}>
+            <Text style={styles.seeAllText} variant="bodyMedium">
+              See All
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {isLoading ? (
@@ -261,22 +277,27 @@ export const PatientDashboardScreen: React.FC = () => {
             .filter((app) => app.status !== 'BOOKED')
             .slice(0, 3)
             .map((app) => (
-              <Card key={app.id} style={styles.recentCard}>
-                <Card.Content style={styles.recentCardContent}>
-                  <View style={styles.recentDoctorRow}>
-                    <Avatar name={app.doctorName || 'Doctor'} size={36} backgroundColor="#f1f5f9" color="#475569" />
-                    <View style={styles.recentDoctorMeta}>
-                      <Text style={styles.recentDoctorName} variant="titleSmall">
-                        {app.doctorName}
-                      </Text>
-                      <Text style={styles.recentDoctorSpecialty} variant="bodySmall">
-                        {app.specialization} • {formatAppointmentDate(app.appointmentDate)}
-                      </Text>
+              <TouchableOpacity
+                key={app.id}
+                onPress={() => navigation.navigate('AppointmentDetails', { appointmentId: app.id })}
+              >
+                <Card style={styles.recentCard}>
+                  <Card.Content style={styles.recentCardContent}>
+                    <View style={styles.recentDoctorRow}>
+                      <Avatar name={app.doctorName || 'Doctor'} size={36} type="doctor" backgroundColor="#f1f5f9" color="#475569" />
+                      <View style={styles.recentDoctorMeta}>
+                        <Text style={styles.recentDoctorName} variant="titleSmall">
+                          {app.doctorName}
+                        </Text>
+                        <Text style={styles.recentDoctorSpecialty} variant="bodySmall">
+                          {app.specialization} • {formatAppointmentDate(app.appointmentDate)}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <StatusBadge status={app.status} />
-                </Card.Content>
-              </Card>
+                    <StatusBadge status={app.status} />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
             ))
         ) : (
           <View style={styles.noHistoryContainer}>
@@ -390,11 +411,18 @@ const styles = StyleSheet.create({
     opacity: 0.15,
   },
   sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: SPACING.sm,
   },
   sectionTitle: {
     fontWeight: 'bold',
     color: '#1e293b',
+  },
+  seeAllText: {
+    color: COLORS.primary,
+    fontWeight: '600',
   },
   specialtiesScroll: {
     paddingBottom: SPACING.md,

@@ -109,25 +109,29 @@ export const DoctorListScreen: React.FC = () => {
       <Card style={styles.card}>
         <Card.Content style={styles.cardContent}>
           <View style={styles.row}>
-            <Avatar name={item.fullName} size={52} backgroundColor="#e0f2fe" color="#0284c7" />
+            <TouchableOpacity onPress={() => navigation.navigate('DoctorDetails', { doctorId: item.id })}>
+              <Avatar name={item.fullName} size={52} type="doctor" backgroundColor="#e0f2fe" color="#0284c7" />
+            </TouchableOpacity>
             <View style={styles.doctorInfo}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name} variant="titleMedium">
-                  {item.fullName}
+              <TouchableOpacity onPress={() => navigation.navigate('DoctorDetails', { doctorId: item.id })}>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name} variant="titleMedium">
+                    {item.fullName}
+                  </Text>
+                  <Text style={styles.rating} variant="bodySmall">
+                    {getMockRating(item.id)}
+                  </Text>
+                </View>
+                <Text style={styles.specialty} variant="bodyMedium">
+                  {item.specialization} • {item.experienceYears} Years Exp
                 </Text>
-                <Text style={styles.rating} variant="bodySmall">
-                  {getMockRating(item.id)}
-                </Text>
-              </View>
-              <Text style={styles.specialty} variant="bodyMedium">
-                {item.specialization} • {item.experienceYears} Years Exp
-              </Text>
-              <View style={styles.locationRow}>
-                <Icon source="map-marker-outline" size={14} color="#64748b" />
-                <Text style={styles.locationText} variant="bodySmall">
-                  {getMockLocation(item.specialization)}
-                </Text>
-              </View>
+                <View style={styles.locationRow}>
+                  <Icon source="map-marker-outline" size={14} color="#64748b" />
+                  <Text style={styles.locationText} variant="bodySmall">
+                    {getMockLocation(item.specialization)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
               <View style={styles.divider} />
 

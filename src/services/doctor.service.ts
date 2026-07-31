@@ -2,8 +2,8 @@ import { doctorApi } from '@/api/doctor.api';
 import { useDoctorStore } from '@/stores/doctor.store';
 
 export const doctorService = {
-  loadSlots: async () => {
-    const data = await doctorApi.getSlots();
+  loadSlots: async (params?: any) => {
+    const data = await doctorApi.getSlots(params);
     useDoctorStore.getState().setSlots(data.data || []);
     return data;
   },
