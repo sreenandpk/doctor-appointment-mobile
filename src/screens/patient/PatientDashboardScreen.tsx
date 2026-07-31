@@ -98,7 +98,7 @@ export const PatientDashboardScreen: React.FC = () => {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer hasHeader={false}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

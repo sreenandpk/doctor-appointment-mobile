@@ -47,6 +47,11 @@ export const DoctorListScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isMoreLoading, setIsMoreLoading] = useState(false);
+
   // Pre-fill specialty from dashboard nav
   useEffect(() => {
     if (route.params?.specialty) {
@@ -54,12 +59,15 @@ export const DoctorListScreen: React.FC = () => {
     }
   }, [route.params?.specialty]);
 
-  const fetchDoctors = useCallback(async (silent = false) => {
-    if (!silent) {
+  const fetchDoctors = useCallback(async (pageNum = 1, shouldRefresh = false) => {
+    if (pageNum === 1 && !shouldRefresh) {
       setIsLoading(true);
     }
     try {
-      const params: any = {};
+      const params: any = {
+        page: pageNum,
+        limit: 10,
+      };
       if (searchQuery.trim().length > 0) {
         params.name = searchQuery.trim();
       }
@@ -68,24 +76,47 @@ export const DoctorListScreen: React.FC = () => {
       }
       
       const response = await patientApi.searchDoctors(params);
-      if (response && response.data) {
-        setDoctors(response.data);
+      if (response) {
+        const docData = response.data || response;
+        if (Array.isArray(docData)) {
+          if (pageNum === 1) {
+            setDoctors(docData);
+          } else {
+            setDoctors((prev) => [...prev, ...docData]);
+          }
+        }
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages);
+        }
       }
     } catch (err) {
       console.error('Error fetching doctors:', err);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
+      setIsMoreLoading(false);
     }
   }, [searchQuery, selectedSpecialty]);
 
   useEffect(() => {
-    fetchDoctors();
-  }, [fetchDoctors]);
+    setPage(1);
+    fetchDoctors(1, false);
+  }, [searchQuery, selectedSpecialty, fetchDoctors]);
 
   const onRefresh = () => {
     setIsRefreshing(true);
-    fetchDoctors(true);
+    setPage(1);
+    fetchDoctors(1, true);
+  };
+
+  const loadMore = () => {
+    if (isMoreLoading || page >= totalPages) {
+      return;
+    }
+    setIsMoreLoading(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchDoctors(nextPage, false);
   };
 
   const handleSearch = (text: string) => {
@@ -219,6 +250,15 @@ export const DoctorListScreen: React.FC = () => {
           contentContainerStyle={styles.listContainer}
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.2}
+          ListFooterComponent={
+            isMoreLoading ? (
+              <View style={styles.moreLoader}>
+                <SkeletonLoader height={100} borderRadius={RADIUS.large} />
+              </View>
+            ) : null
           }
         />
       ) : (
@@ -358,6 +398,9 @@ const styles = StyleSheet.create({
   emptySub: {
     color: '#64748b',
     textAlign: 'center',
+  },
+  moreLoader: {
+    paddingVertical: SPACING.xs,
   },
 });
 
