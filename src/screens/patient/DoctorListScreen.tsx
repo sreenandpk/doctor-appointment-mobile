@@ -82,7 +82,11 @@ export const DoctorListScreen: React.FC = () => {
           if (pageNum === 1) {
             setDoctors(docData);
           } else {
-            setDoctors((prev) => [...prev, ...docData]);
+            setDoctors((prev) => {
+              const existingIds = new Set(prev.map((d) => d.id));
+              const newItems = docData.filter((d) => !existingIds.has(d.id));
+              return [...prev, ...newItems];
+            });
           }
         }
         if (response.pagination) {
@@ -110,7 +114,7 @@ export const DoctorListScreen: React.FC = () => {
   };
 
   const loadMore = () => {
-    if (isMoreLoading || page >= totalPages) {
+    if (isLoading || isMoreLoading || page >= totalPages) {
       return;
     }
     setIsMoreLoading(true);

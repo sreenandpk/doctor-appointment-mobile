@@ -68,7 +68,11 @@ export const ManageAvailabilityScreen: React.FC = () => {
           if (pageNum === 1) {
             setSlots(slotData);
           } else {
-            setSlots((prev) => [...prev, ...slotData]);
+            setSlots((prev) => {
+              const existingIds = new Set(prev.map((s) => s.id));
+              const newItems = slotData.filter((s: any) => !existingIds.has(s.id));
+              return [...prev, ...newItems];
+            });
           }
         }
         if (response.pagination) {
@@ -95,7 +99,7 @@ export const ManageAvailabilityScreen: React.FC = () => {
   };
 
   const loadMore = () => {
-    if (isMoreLoading || page >= totalPages) {
+    if (isLoading || isMoreLoading || page >= totalPages) {
       return;
     }
     setIsMoreLoading(true);

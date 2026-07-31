@@ -62,7 +62,11 @@ export const MyAppointmentsScreen: React.FC = () => {
         if (pageNum === 1) {
           setAppointments(response.data);
         } else {
-          setAppointments((prev) => [...prev, ...response.data]);
+          setAppointments((prev) => {
+            const existingIds = new Set(prev.map((a) => a.id));
+            const newItems = response.data.filter((a: any) => !existingIds.has(a.id));
+            return [...prev, ...newItems];
+          });
         }
         if (response.pagination) {
           setTotalPages(response.pagination.totalPages);
@@ -89,7 +93,7 @@ export const MyAppointmentsScreen: React.FC = () => {
   };
 
   const loadMore = () => {
-    if (isMoreLoading || page >= totalPages) {
+    if (isLoading || isMoreLoading || page >= totalPages) {
       return;
     }
     setIsMoreLoading(true);
