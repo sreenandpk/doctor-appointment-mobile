@@ -309,6 +309,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: SPACING.md,
     paddingTop: 0,
+    paddingBottom: 80,
     gap: 12,
   },
   card: {
