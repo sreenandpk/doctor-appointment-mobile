@@ -39,12 +39,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         isAuthenticated: true,
         accessToken: data.accessToken,
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-          role: data.user.role,
-          isActive: true, // We assume user is active upon successful login
-        },
+        user: data.user,
         isLoading: false,
       });
     } catch (err: any) {

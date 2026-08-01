@@ -6,11 +6,14 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import { Text, Card, Portal, Dialog, Icon } from 'react-native-paper';
+import { Text, Card, Portal, Dialog, Icon, IconButton } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ScreenContainer from '../../components/common/ScreenContainer';
 import { Button, Avatar, StatusBadge, SkeletonLoader } from '../../components/ui';
 import { useAuthStore } from '@/stores/auth.store';
 import { doctorApi } from '@/api/doctor.api';
+import { DoctorStackParamList } from '@/navigation/DoctorNavigator';
 import { COLORS, RADIUS, SPACING, SHADOWS } from '@/theme';
 
 interface DoctorAppointmentItem {
@@ -23,6 +26,7 @@ interface DoctorAppointmentItem {
 
 export const DoctorDashboardScreen: React.FC = () => {
   const { user, logout, isLoading: isAuthLoading } = useAuthStore();
+  const navigation = useNavigation<NativeStackNavigationProp<DoctorStackParamList>>();
 
   const [appointments, setAppointments] = useState<DoctorAppointmentItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,17 +99,48 @@ export const DoctorDashboardScreen: React.FC = () => {
           <View style={styles.headerRow}>
             <View style={styles.greetingContainer}>
               <Text style={styles.greeting} variant="titleLarge">
-                Dr. {getDoctorName()} 🏥
+                {getDoctorName().startsWith('Dr.') ? getDoctorName() : `Dr. ${getDoctorName()}`} 🏥
               </Text>
               <Text style={styles.subtitle} variant="bodyMedium">
                 {user?.DoctorProfile?.specialization || 'Healthcare Professional'}
               </Text>
             </View>
-            <TouchableOpacity onPress={() => setLogoutVisible(true)}>
-              <Avatar name={`Dr. ${getDoctorName()}`} size={44} backgroundColor={COLORS.primary} />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <Avatar name={getDoctorName()} size={40} type="doctor" backgroundColor={COLORS.primary} />
+              <IconButton
+                icon="logout"
+                iconColor="#64748b"
+                size={22}
+                onPress={() => setLogoutVisible(true)}
+                style={styles.logoutButton}
+              />
+            </View>
           </View>
         </View>
+
+        {/* Quick Manage Availability Banner */}
+        <Card style={styles.actionCard}>
+          <Card.Content style={styles.actionCardContent}>
+            <View style={styles.actionCardTextContainer}>
+              <Text style={styles.actionCardTitle} variant="titleLarge">
+                Manage Schedule
+              </Text>
+              <Text style={styles.actionCardSubtitle} variant="bodyMedium">
+                Configure your consultation hours and availability slots
+              </Text>
+              <Button
+                title="Configure Availability"
+                onPress={() => navigation.navigate('ManageAvailability')}
+                style={styles.actionButton}
+                contentStyle={styles.actionButtonContent}
+                textColor="#10b981"
+              />
+            </View>
+            <View style={styles.actionCardIconContainer}>
+              <Icon source="calendar-clock" size={72} color="#ecfdf5" />
+            </View>
+          </Card.Content>
+        </Card>
 
         {/* Stats Row Section */}
         <View style={styles.statsRow}>
@@ -145,22 +180,29 @@ export const DoctorDashboardScreen: React.FC = () => {
           </View>
         ) : upcomingBookings.length > 0 ? (
           upcomingBookings.map((app) => (
-            <Card key={app.id} style={styles.appCard}>
-              <Card.Content style={styles.appCardContent}>
-                <View style={styles.patientRow}>
-                  <Avatar name={app.patientName || 'Patient'} size={40} backgroundColor="#f1f5f9" color="#475569" />
-                  <View style={styles.patientMeta}>
-                    <Text style={styles.patientName} variant="titleSmall">
-                      {app.patientName}
-                    </Text>
-                    <Text style={styles.timeText} variant="bodySmall">
-                      {formatAppointmentDate(app.appointmentDate)} • {app.appointmentTime}
-                    </Text>
+            <TouchableOpacity
+              key={app.id}
+              onPress={() =>
+                navigation.navigate('DoctorAppointmentDetails', { appointmentId: app.id })
+              }
+            >
+              <Card style={styles.appCard}>
+                <Card.Content style={styles.appCardContent}>
+                  <View style={styles.patientRow}>
+                    <Avatar name={app.patientName || 'Patient'} size={40} type="patient" backgroundColor="#f1f5f9" color="#475569" />
+                    <View style={styles.patientMeta}>
+                      <Text style={styles.patientName} variant="titleSmall">
+                        {app.patientName}
+                      </Text>
+                      <Text style={styles.timeText} variant="bodySmall">
+                        {formatAppointmentDate(app.appointmentDate)} • {app.appointmentTime}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <StatusBadge status={app.status} />
-              </Card.Content>
-            </Card>
+                  <StatusBadge status={app.status} />
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
           ))
         ) : (
           <Card style={styles.emptyCard}>
@@ -189,22 +231,29 @@ export const DoctorDashboardScreen: React.FC = () => {
             .filter((app) => app.status !== 'BOOKED')
             .slice(0, 3)
             .map((app) => (
-              <Card key={app.id} style={styles.recentCard}>
-                <Card.Content style={styles.recentCardContent}>
-                  <View style={styles.patientRow}>
-                    <Avatar name={app.patientName || 'Patient'} size={36} backgroundColor="#f8fafc" color="#64748b" />
-                    <View style={styles.patientMeta}>
-                      <Text style={styles.recentPatientName} variant="titleSmall">
-                        {app.patientName}
-                      </Text>
-                      <Text style={styles.timeText} variant="bodySmall">
-                        {formatAppointmentDate(app.appointmentDate)} • {app.appointmentTime}
-                      </Text>
+              <TouchableOpacity
+                key={app.id}
+                onPress={() =>
+                  navigation.navigate('DoctorAppointmentDetails', { appointmentId: app.id })
+                }
+              >
+                <Card key={app.id} style={styles.recentCard}>
+                  <Card.Content style={styles.recentCardContent}>
+                    <View style={styles.patientRow}>
+                      <Avatar name={app.patientName || 'Patient'} size={36} type="patient" backgroundColor="#f8fafc" color="#64748b" />
+                      <View style={styles.patientMeta}>
+                        <Text style={styles.recentPatientName} variant="titleSmall">
+                          {app.patientName}
+                        </Text>
+                        <Text style={styles.timeText} variant="bodySmall">
+                          {formatAppointmentDate(app.appointmentDate)} • {app.appointmentTime}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <StatusBadge status={app.status} />
-                </Card.Content>
-              </Card>
+                    <StatusBadge status={app.status} />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
             ))
         ) : (
           <View style={styles.noHistoryContainer}>
@@ -220,7 +269,7 @@ export const DoctorDashboardScreen: React.FC = () => {
         <Dialog visible={logoutVisible} onDismiss={() => setLogoutVisible(false)} style={styles.dialog}>
           <Dialog.Title style={styles.dialogTitle}>Sign Out</Dialog.Title>
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure you want to sign out of CareConnect?</Text>
+            <Text variant="bodyMedium">Are you sure you want to sign out of Doctor Booking?</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -257,6 +306,53 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  logoutButton: {
+    margin: 0,
+    marginRight: -8,
+  },
+  actionCard: {
+    backgroundColor: '#10b981',
+    borderRadius: RADIUS.large,
+    marginBottom: SPACING.lg,
+    overflow: 'hidden',
+    ...SHADOWS.light,
+  },
+  actionCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+  },
+  actionCardTextContainer: {
+    flex: 2,
+  },
+  actionCardTitle: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  actionCardSubtitle: {
+    color: '#ecfdf5',
+    marginVertical: SPACING.xs,
+  },
+  actionButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: RADIUS.medium,
+    marginTop: SPACING.xs,
+    alignSelf: 'flex-start',
+  },
+  actionButtonContent: {
+    height: 38,
+  },
+  actionCardIconContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.15,
   },
   greetingContainer: {
     flex: 1,

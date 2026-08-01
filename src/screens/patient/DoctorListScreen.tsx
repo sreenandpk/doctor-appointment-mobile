@@ -47,6 +47,11 @@ export const DoctorListScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isMoreLoading, setIsMoreLoading] = useState(false);
+
   // Pre-fill specialty from dashboard nav
   useEffect(() => {
     if (route.params?.specialty) {
@@ -54,12 +59,15 @@ export const DoctorListScreen: React.FC = () => {
     }
   }, [route.params?.specialty]);
 
-  const fetchDoctors = useCallback(async (silent = false) => {
-    if (!silent) {
+  const fetchDoctors = useCallback(async (pageNum = 1, shouldRefresh = false) => {
+    if (pageNum === 1 && !shouldRefresh) {
       setIsLoading(true);
     }
     try {
-      const params: any = {};
+      const params: any = {
+        page: pageNum,
+        limit: 10,
+      };
       if (searchQuery.trim().length > 0) {
         params.name = searchQuery.trim();
       }
@@ -68,24 +76,51 @@ export const DoctorListScreen: React.FC = () => {
       }
       
       const response = await patientApi.searchDoctors(params);
-      if (response && response.data) {
-        setDoctors(response.data);
+      if (response) {
+        const docData = response.data || response;
+        if (Array.isArray(docData)) {
+          if (pageNum === 1) {
+            setDoctors(docData);
+          } else {
+            setDoctors((prev) => {
+              const existingIds = new Set(prev.map((d) => d.id));
+              const newItems = docData.filter((d) => !existingIds.has(d.id));
+              return [...prev, ...newItems];
+            });
+          }
+        }
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages);
+        }
       }
     } catch (err) {
       console.error('Error fetching doctors:', err);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
+      setIsMoreLoading(false);
     }
   }, [searchQuery, selectedSpecialty]);
 
   useEffect(() => {
-    fetchDoctors();
-  }, [fetchDoctors]);
+    setPage(1);
+    fetchDoctors(1, false);
+  }, [searchQuery, selectedSpecialty, fetchDoctors]);
 
   const onRefresh = () => {
     setIsRefreshing(true);
-    fetchDoctors(true);
+    setPage(1);
+    fetchDoctors(1, true);
+  };
+
+  const loadMore = () => {
+    if (isLoading || isMoreLoading || page >= totalPages) {
+      return;
+    }
+    setIsMoreLoading(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchDoctors(nextPage, false);
   };
 
   const handleSearch = (text: string) => {
@@ -109,25 +144,29 @@ export const DoctorListScreen: React.FC = () => {
       <Card style={styles.card}>
         <Card.Content style={styles.cardContent}>
           <View style={styles.row}>
-            <Avatar name={item.fullName} size={52} backgroundColor="#e0f2fe" color="#0284c7" />
+            <TouchableOpacity onPress={() => navigation.navigate('DoctorDetails', { doctorId: item.id })}>
+              <Avatar name={item.fullName} size={52} type="doctor" backgroundColor="#e0f2fe" color="#0284c7" />
+            </TouchableOpacity>
             <View style={styles.doctorInfo}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name} variant="titleMedium">
-                  {item.fullName}
+              <TouchableOpacity onPress={() => navigation.navigate('DoctorDetails', { doctorId: item.id })}>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name} variant="titleMedium">
+                    {item.fullName}
+                  </Text>
+                  <Text style={styles.rating} variant="bodySmall">
+                    {getMockRating(item.id)}
+                  </Text>
+                </View>
+                <Text style={styles.specialty} variant="bodyMedium">
+                  {item.specialization} • {item.experienceYears} Years Exp
                 </Text>
-                <Text style={styles.rating} variant="bodySmall">
-                  {getMockRating(item.id)}
-                </Text>
-              </View>
-              <Text style={styles.specialty} variant="bodyMedium">
-                {item.specialization} • {item.experienceYears} Years Exp
-              </Text>
-              <View style={styles.locationRow}>
-                <Icon source="map-marker-outline" size={14} color="#64748b" />
-                <Text style={styles.locationText} variant="bodySmall">
-                  {getMockLocation(item.specialization)}
-                </Text>
-              </View>
+                <View style={styles.locationRow}>
+                  <Icon source="map-marker-outline" size={14} color="#64748b" />
+                  <Text style={styles.locationText} variant="bodySmall">
+                    {getMockLocation(item.specialization)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
               <View style={styles.divider} />
 
@@ -137,7 +176,7 @@ export const DoctorListScreen: React.FC = () => {
                     Consultation Fee
                   </Text>
                   <Text style={styles.feeValue} variant="titleSmall">
-                    ${parseFloat(item.consultationFee).toFixed(0)}
+                    ₹{parseFloat(item.consultationFee).toFixed(0)}
                   </Text>
                 </View>
                 <Button
@@ -216,6 +255,15 @@ export const DoctorListScreen: React.FC = () => {
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
           }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.2}
+          ListFooterComponent={
+            isMoreLoading ? (
+              <View style={styles.moreLoader}>
+                <SkeletonLoader height={100} borderRadius={RADIUS.large} />
+              </View>
+            ) : null
+          }
         />
       ) : (
         <View style={styles.emptyContainer}>
@@ -265,6 +313,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: SPACING.md,
     paddingTop: 0,
+    paddingBottom: 80,
     gap: 12,
   },
   card: {
@@ -354,6 +403,9 @@ const styles = StyleSheet.create({
   emptySub: {
     color: '#64748b',
     textAlign: 'center',
+  },
+  moreLoader: {
+    paddingVertical: SPACING.xs,
   },
 });
 

@@ -5,11 +5,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface ScreenContainerProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  hasHeader?: boolean;
 }
 
 export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   children,
   style,
+  hasHeader = true,
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -18,7 +20,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
       style={[
         styles.container,
         {
-          paddingTop: insets.top,
+          paddingTop: hasHeader ? 0 : insets.top,
           paddingBottom: insets.bottom,
           paddingLeft: insets.left,
           paddingRight: insets.right,

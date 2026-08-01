@@ -3,7 +3,7 @@ import Config from 'react-native-config';
 import { useAuthStore } from '@/stores/auth.store';
 
 const api = axios.create({
-  baseURL: Config.API_URL || 'http://10.0.2.2:3001/api/v1',
+  baseURL: Config.API_URL || 'https://doctor-appointment-backend-production-4cba.up.railway.app/api/v1',
   timeout: Number(Config.API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',

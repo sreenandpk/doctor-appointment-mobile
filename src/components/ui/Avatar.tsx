@@ -8,6 +8,8 @@ interface AvatarProps {
   size?: number;
   color?: string;
   backgroundColor?: string;
+  uri?: string;
+  type?: 'doctor' | 'patient';
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -15,6 +17,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   size = 48,
   color = '#ffffff',
   backgroundColor = COLORS.primary,
+  uri,
+  type,
 }) => {
   const getInitials = (fullName: string) => {
     const parts = fullName.trim().split(/\s+/);
@@ -28,6 +32,38 @@ export const Avatar: React.FC<AvatarProps> = ({
   };
 
   const initials = getInitials(name);
+
+  if (uri) {
+    return (
+      <View style={styles.container}>
+        <PaperAvatar.Image size={size} source={{ uri }} style={{ backgroundColor }} />
+      </View>
+    );
+  }
+
+  if (type === 'doctor') {
+    return (
+      <View style={styles.container}>
+        <PaperAvatar.Image
+          size={size}
+          source={require('../../assets/images/doctor_default.png')}
+          style={{ backgroundColor }}
+        />
+      </View>
+    );
+  }
+
+  if (type === 'patient') {
+    return (
+      <View style={styles.container}>
+        <PaperAvatar.Image
+          size={size}
+          source={require('../../assets/images/patient_default.png')}
+          style={{ backgroundColor }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
