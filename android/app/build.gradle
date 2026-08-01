@@ -45,7 +45,7 @@ react {
 
     /* Hermes Commands */
     //   The hermes compiler command to run. By default it is 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    hermesCommand = "$rootDir/../node_modules/.pnpm/hermes-compiler@250829098.0.16/node_modules/hermes-compiler/hermesc/win64-bin/hermesc.exe"
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]
@@ -76,6 +76,12 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+
+    externalNativeBuild {
+        cmake {
+            buildStagingDirectory = file("D:/b/app/.cxx")
+        }
+    }
 
     namespace "com.doctorappointmentmobile"
     defaultConfig {
@@ -117,3 +123,5 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

@@ -5,8 +5,8 @@ export const doctorApi = {
     const response = await api.post('/doctor/availability', slotData);
     return response.data;
   },
-  getSlots: async () => {
-    const response = await api.get('/doctor/availability');
+  getSlots: async (params?: any) => {
+    const response = await api.get('/doctor/availability', { params });
     return response.data;
   },
   updateSlot: async (id: string, slotData: any) => {
