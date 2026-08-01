@@ -19,7 +19,3 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
-
-subprojects {
-    buildDir = "D:/b/${rootProject.name}/${project.name}"
-}
